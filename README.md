@@ -20,3 +20,20 @@ To properly compile depended C libraries (during bildout run) the following chan
 > SET VS90COMNTOOLS=%VS120COMNTOOLS%  # with Visual Studio 2013 installed (Visual Studio Version 12)
 
 The list of precompiled libraries for windows you can find here http://www.lfd.uci.edu/~gohlke/pythonlibs/
+
+
+### Configuration example
+To make this piece source code to work properly you have to provide configuration file in environment variable *EFA_CONFIG*
+
+Exapmle:
+```yaml
+logging:
+  level: 10 #10 is for 
+ 
+evernote:
+  auth_token: "blah-blah-blah" #Evernote Auth token
+  sandbox: True #Use https://sandbox.evernote.com/ instead of prod
+
+font_size: 20 #Font size you are going to make your notes
+line_height: 150 #Line height interval
+```

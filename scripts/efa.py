@@ -40,7 +40,7 @@ def debug_decorator(func):
 @debug_decorator
 def start_efa():
     """
-    Get all information from Toggle service
+    Call for Evernote
     :return:
     """
     client = EvernoteClient(token=conf.evernote.auth_token,
