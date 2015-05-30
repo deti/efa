@@ -23,12 +23,13 @@ The list of precompiled libraries for windows you can find here http://www.lfd.u
 
 
 ### Configuration example
-To make this piece source code to work properly you have to provide configuration file in environment variable *EFA_CONFIG*
+To make this piece source code to work properly, you have to provide configuration file 
+in environment variable *EFA_CONFIG=/path/to/conf.yaml*
 
 Exapmle:
 ```yaml
 logging:
-  level: 10 #10 is for 
+  level: 10 #10 is for Debug logs, 30 is for Warning by Default
  
 evernote:
   auth_token: "blah-blah-blah" #Evernote Auth token
