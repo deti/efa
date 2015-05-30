@@ -9,15 +9,10 @@ https://dev.evernote.com/doc/
 """
 import conf
 import logging
-import requests
-from requests.auth import HTTPBasicAuth
-import json
-from urllib.parse import urljoin
-from datetime import datetime, timedelta
-import pytz
-import iso8601
 from functools import wraps
-from tabulate import tabulate
+
+from evernote.api.client import EvernoteClient
+from evernote.edam.notestore import NoteStore
 
 def config_logging():
     import os
@@ -48,23 +43,22 @@ def start_efa():
     Get all information from Toggle service
     :return:
     """
-    print ("Hello world")
+    client = EvernoteClient(token=conf.evernote.auth_token,
+                            sandbox=conf.evernote.sandbox)
+    userStore = client.get_user_store()
+    user = userStore.getUser()
+    print (user.username)
+
 
 
 
 def main():
     config_logging()
-    print ("efa 3")
-    # config_tz()
     logging.info("-------- Start {} --------".format(conf.app_name))
-    print ("efa 4")
-    start_efa
+    start_efa()
     logging.info("-------- Finish {} -------".format(conf.app_name))
-    print ("efa 5")
 
 if __name__=="__main__":
-    print ("efa 1")
     main()
-    print ("efa 2")
 
 

@@ -1,6 +1,13 @@
 #extend:
 app_name: "efa"
 
+evernote:
+  api_token: __FIX_ME__
+  sandbox: False
+  notebooks:
+    - "read"
+
+
 logging:
   log_dir: ${join(ROOT, "log")}
   log_filename: ${app_name+".log"}
@@ -15,3 +22,6 @@ logging:
           #INFO = 20
           #DEBUG = 10
           #NOTSET = 0
+
+font_size: 20
+line_height: 150

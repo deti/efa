@@ -4,9 +4,6 @@ from setuptools import setup, find_packages
 install_requires = [
     "metayaml",
     "attrdict",
-    "pytz",
-    "iso8601",
-    "tabulate",
     "evernote",
 ]
 
