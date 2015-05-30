@@ -5,7 +5,7 @@ evernote:
   api_token: __FIX_ME__
   sandbox: False
   notebooks:
-    - "read"
+    -
 
 
 logging:

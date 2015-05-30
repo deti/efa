@@ -35,6 +35,29 @@ def debug_decorator(func):
         return result
     return func_wrapper
 
+def client():
+    """
+    :return: client object. On first call esteblish connection and save in conf
+    """
+    if not hasattr(conf, "_client"):
+        conf._client = EvernoteClient(token=conf.evernote.auth_token,
+                                      sandbox=conf.evernote.sandbox)
+    return conf._client
+
+
+@debug_decorator
+def get_notebooks():
+    """
+    Call Evernote for notebooks and filter only needed ones
+    :return: List of Notebooks objects with names listed in evernote.notebooks
+    """
+    notebooks = list()
+    noteStore = client().get_note_store()
+    got_notebooks = noteStore.listNotebooks()
+    for n in got_notebooks:
+        if n.name in conf.evernote.notebooks:
+           notebooks.append(n)
+    return notebooks
 
 
 @debug_decorator
@@ -43,11 +66,7 @@ def start_efa():
     Call for Evernote
     :return:
     """
-    client = EvernoteClient(token=conf.evernote.auth_token,
-                            sandbox=conf.evernote.sandbox)
-    userStore = client.get_user_store()
-    user = userStore.getUser()
-    print (user.username)
+    notebooks = get_notebooks()
 
 
 

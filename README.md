@@ -34,6 +34,9 @@ logging:
 evernote:
   auth_token: "blah-blah-blah" #Evernote Auth token
   sandbox: True #Use https://sandbox.evernote.com/ instead of prod
+  notebooks: # List of Notebooks names to adjust
+    - "notebook1"
+    - "notebook2"
 
 font_size: 20 #Font size you are going to make your notes
 line_height: 150 #Line height interval
