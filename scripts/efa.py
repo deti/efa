@@ -59,14 +59,42 @@ def get_notebooks():
            notebooks.append(n)
     return notebooks
 
+@debug_decorator
+def get_notes(notebooks):
+    """
+    :param notebooks: List of evernote Notebook objects
+    :return: List of Notes for passed Notebook
+    """
+    notes = list()
+    for notebook in notebooks:
+        filter = NoteStore.NoteFilter()
+        filter.notebookGuid = notebook.guid
+
+        noteStore = client().get_note_store()
+        note_list = noteStore.findNotes(conf.evernote.auth_token, filter, 0, 500) #todo: add paging
+        notes.append(note_list.notes)
+    return notes
 
 @debug_decorator
-def start_efa():
+def adjust_note(note):
+    noteStore = client().get_note_store()
+    content = noteStore.getNoteContent(conf.evernote.auth_token, note.guid)
+    if content.find("<span style=\"font-size: ") < 0:
+        replacement = "<p><span style=\"font-size: {}px; line-height: {}%;\">".format(
+            conf.font_size, conf.line_height)
+        content = content.replace("<p>", replacement)
+        content = content.replace("</p>","</span></p>")
+        note.content = content
+        noteStore.updateNote(conf.evernote.auth_token, note)
+
+@debug_decorator
+def adjust_evernote_font():
     """
     Call for Evernote
-    :return:
     """
     notebooks = get_notebooks()
+    for note in get_notes(notebooks):
+        adjust_note(note)
 
 
 
@@ -74,7 +102,7 @@ def start_efa():
 def main():
     config_logging()
     logging.info("-------- Start {} --------".format(conf.app_name))
-    start_efa()
+    adjust_evernote_font()
     logging.info("-------- Finish {} -------".format(conf.app_name))
 
 if __name__=="__main__":
