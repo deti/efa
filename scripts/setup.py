@@ -2,12 +2,18 @@ import os
 from setuptools import setup, find_packages
 
 install_requires = [
-    "requests",
     "metayaml",
     "attrdict",
     "pytz",
     "iso8601",
     "tabulate",
+    "evernote",
+]
+
+dependency_links = [
+    #Use direct link to Github because pypi version doesn't install at all
+    #On the date 2015 May 30
+    "https://github.com/evernote/evernote-sdk-python3/archive/master.zip#egg=evernote"
 ]
 
 fiefar_dependencies = [
@@ -33,6 +39,7 @@ setup(
         '': ['*.sh', '*.ini', '*.pem', '*.txt'],
         'configs': ['*.yaml']},
     install_requires=install_requires,
+    dependency_links=dependency_links,
     entry_points={
         'console_scripts':
         [
