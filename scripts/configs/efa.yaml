@@ -23,5 +23,10 @@ logging:
           #DEBUG = 10
           #NOTSET = 0
 
+db:
+  db_dir: ${join(ROOT, "db")}
+  db_filename: ${app_name+".sqlite"}
+  db_file: ${join(db.db_dir, db.db_filename)}
+
 font_size: 20
 line_height: 160

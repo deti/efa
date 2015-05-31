@@ -11,7 +11,7 @@ import conf
 import logging
 from functools import wraps
 from xml.dom import minidom
-
+from sqlitedict import SqliteDict
 
 from evernote.api.client import EvernoteClient
 from evernote.edam.notestore import NoteStore
@@ -93,15 +93,25 @@ def adjust_note(note):
     noteStore.updateNote(conf.evernote.auth_token, note)
 
 
+FONT_SIZE = "FONT_SIZE"
+LINE_HEIGHT = "LINE_HEIGHT"
 @debug_decorator
 def adjust_evernote_font():
     """
     Call for Evernote
     """
+    mydict = SqliteDict(conf.db.db_file, autocommit=True)
+
     for note in get_notes( get_notebooks() ):
-        adjust_note(note)
+        guid = note.guid
+        if guid not in mydict.keys() \
+            or mydict[guid][FONT_SIZE] != conf.font_size \
+            or mydict[guid][LINE_HEIGHT] != conf.line_height:
+            adjust_note(note)
+            mydict[guid] = {FONT_SIZE:conf.font_size,
+                            LINE_HEIGHT:conf.line_height}
 
-
+    mydict.close()
 
 
 def main():

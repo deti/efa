@@ -5,6 +5,7 @@ install_requires = [
     "metayaml",
     "attrdict",
     "evernote",
+    "sqlitedict",
 ]
 
 dependency_links = [

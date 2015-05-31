@@ -3,6 +3,7 @@
 *.py[co]
 *.log
 /bin
+/db
 /log
 develop-eggs/
 downloads/
