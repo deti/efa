@@ -10,6 +10,8 @@ https://dev.evernote.com/doc/
 import conf
 import logging
 from functools import wraps
+from xml.dom import minidom
+
 
 from evernote.api.client import EvernoteClient
 from evernote.edam.notestore import NoteStore
@@ -79,13 +81,13 @@ def get_notes(notebooks):
 def adjust_note(note):
     noteStore = client().get_note_store()
     content = noteStore.getNoteContent(conf.evernote.auth_token, note.guid)
-    if content.find("<span style=\"font-size: ") < 0:
-        replacement = "<p><span style=\"font-size: {}px; line-height: {}%;\">".format(
-            conf.font_size, conf.line_height)
-        content = content.replace("<p>", replacement)
-        content = content.replace("</p>","</span></p>")
-        note.content = content
-        noteStore.updateNote(conf.evernote.auth_token, note)
+    dom = minidom.parseString(content)
+    for div in dom.getElementsByTagName("div"):
+        div.setAttribute("style", "font-size: {}px; line-height: {}%;".format(conf.font_size, conf.line_height))
+    note.content = dom.toxml()
+    logging.debug("Saving note:\n{}".format(note))
+    noteStore.updateNote(conf.evernote.auth_token, note)
+
 
 @debug_decorator
 def adjust_evernote_font():
