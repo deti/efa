@@ -79,11 +79,15 @@ def get_notes(notebooks):
 
 @debug_decorator
 def adjust_note(note):
+    '''
+    :param note: Update note style
+    '''
     noteStore = client().get_note_store()
     content = noteStore.getNoteContent(conf.evernote.auth_token, note.guid)
     dom = minidom.parseString(content)
     for div in dom.getElementsByTagName("div"):
-        div.setAttribute("style", "font-size: {}px; line-height: {}%;".format(conf.font_size, conf.line_height))
+        div.setAttribute("style", "font-size: {}px; line-height: {}%;"\
+                         .format(conf.font_size, conf.line_height))
     note.content = dom.toxml()
     logging.debug("Saving note:\n{}".format(note))
     noteStore.updateNote(conf.evernote.auth_token, note)
@@ -94,8 +98,7 @@ def adjust_evernote_font():
     """
     Call for Evernote
     """
-    notebooks = get_notebooks()
-    for note in get_notes(notebooks):
+    for note in get_notes( get_notebooks() ):
         adjust_note(note)
 
 
