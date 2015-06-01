@@ -73,8 +73,13 @@ def get_notes(notebooks):
         filter.notebookGuid = notebook.guid
 
         noteStore = client().get_note_store()
-        note_list = noteStore.findNotes(conf.evernote.auth_token, filter, 0, 500) #todo: add paging
-        notes.extend(note_list.notes)
+        step = 50
+        start = 0
+        note_list = noteStore.findNotes(conf.evernote.auth_token, filter, start, step)
+        while note_list.notes:
+            notes.extend(note_list.notes)
+            start += step
+            note_list = noteStore.findNotes(conf.evernote.auth_token, filter, start, step)
     return notes
 
 @debug_decorator
