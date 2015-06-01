@@ -16,8 +16,10 @@ from sqlitedict import SqliteDict
 from evernote.api.client import EvernoteClient
 from evernote.edam.notestore import NoteStore
 
+
 def config_logging():
     import os
+
     if not os.path.exists(conf.logging.log_dir):
         os.mkdir(conf.logging.log_dir)
     logging.basicConfig(filename=conf.logging.log_file,
@@ -36,8 +38,11 @@ def debug_decorator(log_result=True):
                 log_str = "{}. Result: {}".format(log_str, result)
             logging.debug(log_str)
             return result
+
         return func_wrapper
+
     return parametremized_decorator
+
 
 def client():
     """
@@ -60,8 +65,9 @@ def get_notebooks():
     got_notebooks = noteStore.listNotebooks()
     for n in got_notebooks:
         if n.name in conf.evernote.notebooks:
-           notebooks.append(n)
+            notebooks.append(n)
     return notebooks
+
 
 @debug_decorator(log_result=False)
 def get_notes(notebooks):
@@ -84,6 +90,7 @@ def get_notes(notebooks):
             note_list = noteStore.findNotes(conf.evernote.auth_token, filter, start, step)
     return notes
 
+
 @debug_decorator(log_result=True)
 def adjust_note(note):
     '''
@@ -93,15 +100,17 @@ def adjust_note(note):
     content = noteStore.getNoteContent(conf.evernote.auth_token, note.guid)
     dom = minidom.parseString(content)
     for div in dom.getElementsByTagName("div"):
-        div.setAttribute("style", "font-size: {}px; line-height: {}%;"\
+        div.setAttribute("style", "font-size: {}px; line-height: {}%;" \
                          .format(conf.font_size, conf.line_height))
     note.content = dom.toxml()
-    logging.debug("Saving note: {}".format(note.title))
+    logging.info("Saving note: {}".format(note.title))
     noteStore.updateNote(conf.evernote.auth_token, note)
 
 
 FONT_SIZE = "FONT_SIZE"
 LINE_HEIGHT = "LINE_HEIGHT"
+
+
 @debug_decorator(log_result=True)
 def adjust_evernote_font():
     """
@@ -110,18 +119,18 @@ def adjust_evernote_font():
     note_info = SqliteDict(conf.db.db_file, autocommit=True)
 
     notes_in_evernote = list()
-    for note in get_notes( get_notebooks() ):
+    for note in get_notes(get_notebooks()):
         guid = note.guid
         notes_in_evernote.append(guid)
         if guid not in note_info.keys() \
-            or note_info[guid][FONT_SIZE] != conf.font_size \
-            or note_info[guid][LINE_HEIGHT] != conf.line_height:
+                or note_info[guid][FONT_SIZE] != conf.font_size \
+                or note_info[guid][LINE_HEIGHT] != conf.line_height:
             adjust_note(note)
-            note_info[guid] = {FONT_SIZE:conf.font_size,
-                            LINE_HEIGHT:conf.line_height}
+            note_info[guid] = {FONT_SIZE: conf.font_size,
+                               LINE_HEIGHT: conf.line_height}
 
     guids_to_forget = [guid for guid in note_info.keys()
-                       if guid not in notes_in_evernote ]
+                       if guid not in notes_in_evernote]
 
     for guid in guids_to_forget:
         logging.debug("Delete guid from DB: {}".format(guid))
@@ -136,7 +145,8 @@ def main():
     adjust_evernote_font()
     logging.info("-------- Finish {} -------".format(conf.app_name))
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     main()
 
 
