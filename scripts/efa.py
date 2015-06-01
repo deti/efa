@@ -120,12 +120,12 @@ def adjust_evernote_font():
             note_info[guid] = {FONT_SIZE:conf.font_size,
                             LINE_HEIGHT:conf.line_height}
 
-    guids_to_delete = [guid for guid in note_info.keys()
+    guids_to_forget = [guid for guid in note_info.keys()
                        if guid not in notes_in_evernote ]
 
-    for to_delete in guids_to_delete:
-        logging.debug("Reomoe guid from DB: {}".format(to_delete))
-        del note_info[to_delete]
+    for guid in guids_to_forget:
+        logging.debug("Delete guid from DB: {}".format(guid))
+        del note_info[guid]
 
     note_info.close()
 
