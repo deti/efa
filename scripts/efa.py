@@ -25,17 +25,19 @@ def config_logging():
                         level=conf.logging.level)
 
 
-def debug_decorator(func):
-    @wraps(func)
-    def func_wrapper(*args, **kwargs):
-        logging.debug("{} called".format(func.__name__))
-        result = func(*args, **kwargs)
-        log_str = "{} finished".format(func.__name__)
-        if result:
-            log_str = "{}. Result: {}".format(log_str, result)
-        logging.debug(log_str)
-        return result
-    return func_wrapper
+def debug_decorator(log_result=True):
+    def parametremized_decorator(func):
+        @wraps(func)
+        def func_wrapper(*args, **kwargs):
+            logging.debug("{} called".format(func.__name__))
+            result = func(*args, **kwargs)
+            log_str = "{} finished".format(func.__name__)
+            if result and log_result:
+                log_str = "{}. Result: {}".format(log_str, result)
+            logging.debug(log_str)
+            return result
+        return func_wrapper
+    return parametremized_decorator
 
 def client():
     """
@@ -47,7 +49,7 @@ def client():
     return conf._client
 
 
-@debug_decorator
+@debug_decorator(log_result=False)
 def get_notebooks():
     """
     Call Evernote for notebooks and filter only needed ones
@@ -61,7 +63,7 @@ def get_notebooks():
            notebooks.append(n)
     return notebooks
 
-@debug_decorator
+@debug_decorator(log_result=False)
 def get_notes(notebooks):
     """
     :param notebooks: List of evernote Notebook objects
@@ -82,7 +84,7 @@ def get_notes(notebooks):
             note_list = noteStore.findNotes(conf.evernote.auth_token, filter, start, step)
     return notes
 
-@debug_decorator
+@debug_decorator(log_result=True)
 def adjust_note(note):
     '''
     :param note: Update note style
@@ -94,29 +96,38 @@ def adjust_note(note):
         div.setAttribute("style", "font-size: {}px; line-height: {}%;"\
                          .format(conf.font_size, conf.line_height))
     note.content = dom.toxml()
-    logging.debug("Saving note:\n{}".format(note))
+    logging.debug("Saving note: {}".format(note.title))
     noteStore.updateNote(conf.evernote.auth_token, note)
 
 
 FONT_SIZE = "FONT_SIZE"
 LINE_HEIGHT = "LINE_HEIGHT"
-@debug_decorator
+@debug_decorator(log_result=True)
 def adjust_evernote_font():
     """
     Call for Evernote
     """
-    mydict = SqliteDict(conf.db.db_file, autocommit=True)
+    note_info = SqliteDict(conf.db.db_file, autocommit=True)
 
+    notes_in_evernote = list()
     for note in get_notes( get_notebooks() ):
         guid = note.guid
-        if guid not in mydict.keys() \
-            or mydict[guid][FONT_SIZE] != conf.font_size \
-            or mydict[guid][LINE_HEIGHT] != conf.line_height:
+        notes_in_evernote.append(guid)
+        if guid not in note_info.keys() \
+            or note_info[guid][FONT_SIZE] != conf.font_size \
+            or note_info[guid][LINE_HEIGHT] != conf.line_height:
             adjust_note(note)
-            mydict[guid] = {FONT_SIZE:conf.font_size,
+            note_info[guid] = {FONT_SIZE:conf.font_size,
                             LINE_HEIGHT:conf.line_height}
 
-    mydict.close()
+    guids_to_delete = [guid for guid in note_info.keys()
+                       if guid not in notes_in_evernote ]
+
+    for to_delete in guids_to_delete:
+        logging.debug("Reomoe guid from DB: {}".format(to_delete))
+        del note_info[to_delete]
+
+    note_info.close()
 
 
 def main():
