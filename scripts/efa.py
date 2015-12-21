@@ -19,7 +19,6 @@ from evernote.edam.notestore import NoteStore
 
 def config_logging():
     import os
-
     if not os.path.exists(conf.logging.log_dir):
         os.mkdir(conf.logging.log_dir)
     logging.basicConfig(filename=conf.logging.log_file,
@@ -27,7 +26,10 @@ def config_logging():
                         level=conf.logging.level)
 
 
-def debug_decorator(log_result=True):
+def debug_decorator(log_result=False):
+    """
+    :param log_result: If true debug func output
+    """
     def parametremized_decorator(func):
         @wraps(func)
         def func_wrapper(*args, **kwargs):
@@ -54,7 +56,7 @@ def client():
     return conf._client
 
 
-@debug_decorator(log_result=False)
+@debug_decorator(log_result=True)
 def get_notebooks():
     """
     Call Evernote for notebooks and filter only needed ones
@@ -68,8 +70,7 @@ def get_notebooks():
             notebooks.append(n)
     return notebooks
 
-
-@debug_decorator(log_result=False)
+@debug_decorator()
 def get_notes(notebooks):
     """
     :param notebooks: List of evernote Notebook objects

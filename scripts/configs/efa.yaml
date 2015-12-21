@@ -7,7 +7,6 @@ evernote:
   notebooks:
     -
 
-
 logging:
   log_dir: ${join(ROOT, "log")}
   log_filename: ${app_name+".log"}

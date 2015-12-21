@@ -6,6 +6,7 @@ from setuptools import setup, find_packages
 install_requires = [
     "metayaml",
     "attrdict",
+    "oauth2", #required by evernote3
     "evernote3",
     "sqlitedict",
 ]
